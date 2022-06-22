@@ -23,4 +23,10 @@ Route::post('auth/reset', 'AuthController@reset'); // 账号密码重置
 Route::post('auth/profile', 'AuthController@profile'); // 账号修改
 Route::get('auth/info', 'AuthController@info'); // 用户信息
 
+// 用户模块--地址
+Route::get('address/list', 'AddressController@list');
+Route::get('address/detail', 'AddressController@detail');
+Route::post('address/save', 'AddressController@save');
+Route::post('address/delete', 'AddressController@delete');
+
 Route::get('home/index', 'HomeController@index'); // 首页数据接口

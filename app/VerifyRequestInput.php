@@ -19,6 +19,11 @@ trait VerifyRequestInput
         return $this->verifyData($key, $default, 'string');
     }
 
+    public function verifyRequiredString($key, $default = null)
+    {
+        return $this->verifyData($key, $default, 'required|string');
+    }
+
     public function verifyBoolean($key, $default = null)
     {
         return $this->verifyData($key, $default, 'boolean');
@@ -42,6 +47,11 @@ trait VerifyRequestInput
     public function verifyArrayNotEmpty($key, $default = null)
     {
         return $this->verifyData($key, $default, 'array|min:1');
+    }
+
+    public function verifyMobile()
+    {
+        return $this->verifyData('mobile', null, 'required|regex:/^1[345789][0-9]{9}$/');
     }
 
     public function verifyData($key, $default, $rule)

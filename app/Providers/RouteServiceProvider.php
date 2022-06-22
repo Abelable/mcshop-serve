@@ -48,7 +48,7 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/web.php'));
 
             Route::prefix('wx')
-                ->namespace($this->namespace)
+                ->namespace($this->namespace . '\Wx')
                 ->group(base_path('routes/wx.php'));
         });
     }

@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
-
+namespace App\Http\Controllers\Wx;
 
 use App\CodeResponse;
+use App\Http\Controllers\Controller;
+use App\Models\User\User;
 use App\VerifyRequestInput;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -38,6 +39,9 @@ class WxController extends Controller
         return $this->user()->getAuthIdentifier();
     }
 
+    /**
+     * @return User
+     */
     public function user()
     {
         return Auth::guard('wx')->user();
@@ -120,6 +124,6 @@ class WxController extends Controller
             $res['data'] = $data;
         }
         $res['errmsg'] = $info ?: $errmsg;
-        return request()->json($res);
+        return response()->json($res);
     }
 }

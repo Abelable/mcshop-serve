@@ -14,6 +14,11 @@ trait VerifyRequestInput
         return $this->verifyData($key, $default, 'integer|digits_between:1,20');
     }
 
+    public function verifyRequiredId($key, $default = null)
+    {
+        return $this->verifyData($key, $default, 'required|integer|digits_between:1,20');
+    }
+
     public function verifyString($key, $default = null)
     {
         return $this->verifyData($key, $default, 'string');

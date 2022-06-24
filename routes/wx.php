@@ -24,9 +24,23 @@ Route::post('auth/profile', 'AuthController@profile'); // 账号修改
 Route::get('auth/info', 'AuthController@info'); // 用户信息
 
 // 用户模块--地址
-Route::get('address/list', 'AddressController@list');
-Route::get('address/detail', 'AddressController@detail');
-Route::post('address/save', 'AddressController@save');
-Route::post('address/delete', 'AddressController@delete');
+Route::get('address/list', 'AddressController@list'); // 收货地址列表
+Route::get('address/detail', 'AddressController@detail'); // 收货地址详情
+Route::post('address/save', 'AddressController@save'); // 保存收货地址
+Route::post('address/delete', 'AddressController@delete'); // 删除收货地址
+
+// 商品模块--分类
+Route::get('catalog/index', 'CategoryController@index'); // 分类目录全部分类数据接口
+Route::get('catalog/current', 'CategoryController@current'); // 分类目录当前分类数据接口
+
+// 商品模块--品牌
+Route::get('brand/list', 'BrandController@list'); // 品牌列表
+Route::get('brand/detail', 'BrandController@detail'); // 品牌详情
+
+// 商品模块--商品
+Route::get('goods/count', 'GoodsController@count'); // 统计在售商品总数
+Route::get('goods/category', 'GoodsController@category'); // 根据分类获取商品列表数据
+Route::get('goods/list', 'GoodsController@list'); // 获得商品列表
+Route::get('goods/detail', 'GoodsController@detail'); // 获得商品的详情
 
 Route::get('home/index', 'HomeController@index'); // 首页数据接口

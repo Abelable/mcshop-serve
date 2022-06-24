@@ -8,6 +8,7 @@ class CodeResponse
     const FAIL = [-1, '失败'];
     const PARAM_ILLEGAL = [401, '参数不合法'];
     const PARAM_VALUE_ILLEGAL = [402, '参数值不对'];
+    const NOT_FOUND = [404, '数据不存在'];
     const UN_LOGIN = [501, '未登录'];
     const SYSTEM_ERROR = [502, '系统内部错误'];
     const UPDATED_FAIL = [505, '数据更新失败'];

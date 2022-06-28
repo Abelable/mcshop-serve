@@ -100,4 +100,12 @@ class GoodsService extends BaseService
         ]);
         return $footprint->save();
     }
+
+    public function getGoodsListByIds(array $ids)
+    {
+        if (empty($ids)) {
+            return collect([]);
+        }
+        return Goods::query()->whereIn('id', $ids)->get();
+    }
 }

@@ -86,6 +86,10 @@ class GoodsService extends BaseService
         return GoodsProduct::query()->where('goods_id', $goodsId)->get();
     }
 
+    public function getGoodsProduct(int $id, $columns = ['*']) {
+        return GoodsProduct::query()->find($id, $columns);
+    }
+
     public function getGoodsIssue($page = 1, $limit = 4)
     {
         return Issue::query()->forPage($page, $limit)->get();

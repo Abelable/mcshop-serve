@@ -4,12 +4,14 @@ namespace App\Services\Promotion;
 
 use App\CodeResponse;
 use App\Enums\CouponEnums;
+use App\Enums\CouponUserEnums;
 use App\Input\PageInput;
 use App\Models\Promotion\Coupon;
 use App\Models\Promotion\CouponUser;
 use App\Services\BaseService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use function Symfony\Component\Translation\t;
 
 class CouponService extends BaseService
 {
@@ -70,7 +72,7 @@ class CouponService extends BaseService
 
         // 判断用户领取数量是否已超过限领数量
         if ($coupon->limit > 0) {
-            $userReceivedCount = $this->getUserReceiverdCount($couponId, $userId);
+            $userReceivedCount = $this->getUserReceivedCount($couponId, $userId);
             if ($userReceivedCount > $coupon->limit) {
                 $this->throwBusinessException(CodeResponse::COUPON_EXCEED_LIMIT, '优惠券已经领取过');
             }
@@ -103,11 +105,101 @@ class CouponService extends BaseService
         return CouponUser::query()->where('coupon_id', $couponId)->count('id');
     }
 
-    public function getUserReceiverdCount(int $couponId, int $userId)
+    public function getUserReceivedCount(int $couponId, int $userId)
     {
         return CouponUser::query()
             ->where('coupon_id', $couponId)
             ->where('user_id', $userId)
             ->count('id');
+    }
+
+    public function getCouponUser(int $id, $columns = ['*'])
+    {
+        return CouponUser::query()->find($id, $columns);
+    }
+
+    public function getPreorderCouponUser(int $userId, $couponId, $couponUserId, $price, &$usableCouponCount)
+    {
+        $couponUsers = $this->getPreorderCouponUsers($userId, $price);
+        $usableCouponCount = $couponUsers->count();
+
+        // 这里存在三种情况
+        // 1. 用户不想使用优惠券，则不处理
+        // 2. 用户想自动使用优惠券，则选择合适优惠券
+        // 3. 用户已选择优惠券，则测试优惠券是否可用；不可用，则返回用户合适优惠券
+        if (is_null($couponId) || $couponId == -1) {
+            return null;
+        }
+        if (!empty($couponId)) {
+            $coupon = $this->getCoupon($couponId);
+            $couponUser = $this->getCouponUser($couponUserId);
+            $isUsable = $this->checkCouponUsable($coupon, $couponUser, $price);
+            if ($isUsable) {
+                return $couponUser;
+            }
+        }
+        return $couponUsers->filter();
+    }
+
+    public function getPreorderCouponUsers(int $userId, $price)
+    {
+        $couponUsers = $this->getUsableCouponUsers($userId);
+        $couponIds = $couponUsers->pluck('coupon_id')->toArray();
+        $coupons = $this->getCoupons($couponIds)->keyBy('id');
+        return $couponUsers->filter(function (CouponUser $couponUser) use ($coupons, $price) {
+            $coupon = $coupons->get($couponUser->coupon_id);
+            return $this->checkCouponUsable($coupon, $couponUser, $price);
+        })->sortByDesc(function (CouponUser $couponUser) use ($coupons) {
+            /** @var Coupon $coupon */
+            $coupon = $coupons->get($couponUser->coupon_id);
+            return $coupon->discount;
+        });
+    }
+
+    public function getUsableCouponUsers(int $userId)
+    {
+        return CouponUser::query()
+            ->where('user_id', $userId)
+            ->where('status', CouponUserEnums::STATUS_USABLE)
+            ->get();
+    }
+
+    public function checkCouponUsable(Coupon $coupon, CouponUser $couponUser, $price)
+    {
+        if (empty($coupon) || empty($couponUser)) {
+            return false;
+        }
+        if ($coupon->id != $couponUser->coupon_id) {
+            return false;
+        }
+        if ($coupon->status != CouponEnums::STATUS_NORMAL) {
+            return false;
+        }
+        if ($coupon->goods_type != CouponEnums::GOODS_TYPE_ALL) {
+            return false;
+        }
+        if (bccomp($coupon->min, $price) == 1) {
+            return false;
+        }
+
+        $now = now();
+        switch ($coupon->time_type) {
+            case CouponEnums::TIME_TYPE_TIME:
+                $start = Carbon::parse($coupon->start_time);
+                $end = Carbon::parse($coupon->end_time);
+                if ($now->isBefore($start) || $now->isAfter($end)) {
+                    return false;
+                }
+                break;
+            case CouponEnums::TIME_TYPE_DAYS:
+                $expired = Carbon::parse($couponUser->add_time)->addDays($coupon->days);
+                if ($now->isAfter($expired)) {
+                    return false;
+                }
+            default:
+                return false;
+        }
+
+        return true;
     }
 }

@@ -47,9 +47,20 @@ Route::get('goods/detail', 'GoodsController@detail'); // 获得商品的详情
 Route::get('coupon/list', 'CouponController@list'); // 优惠券列表
 Route::get('coupon/mylist', 'CouponController@mylist'); // 我的优惠券列表
 Route::post('coupon/receive', 'CouponController@receive'); // 领取优惠券
+//Route::get('coupon/selectlist', 'CouponController@selectlist'); // 当前订单可用优惠券列表
 
 // 营销模块--团购
 Route::get('groupon/list', 'GrouponController@list'); // 团购列表
+
+// 订单模块--购物车
+Route::post('cart/add', 'CartController@add'); // 添加商品到购物车
+Route::post('cart/fastadd', 'CartController@fastadd'); // 立即购买商品
+Route::get('cart/goodscount', 'CartController@goodscount'); // 获取购物车商品件数
+Route::get('cart/index', 'CartController@index'); // 获取购物车列表
+Route::post('cart/update', 'CartController@update'); // 更新购物车的商品
+Route::post('cart/checked', 'CartController@checked'); // 选择或取消选择商品
+Route::post('cart/delete', 'CartController@delete'); // 删除购物车的商品
+Route::get('cart/checkout', 'CartController@checkout'); // 下单前信息确认
 
 Route::get('home/index', 'HomeController@index'); // 首页数据接口
 Route::get('home/redirectShareUrl', 'HomeController@redirectShareUrl')->name('home.redirectShareUrl'); // 获取海报分享页面路径

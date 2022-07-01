@@ -2,9 +2,9 @@
 
 namespace App\Services\Goods;
 
-use App\Input\PageInput;
 use App\Models\Goods\Brand;
 use App\Services\BaseService;
+use App\Utils\Inputs\PageInput;
 
 class BrandService extends BaseService
 {

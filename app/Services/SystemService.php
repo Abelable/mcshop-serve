@@ -59,6 +59,16 @@ class SystemService extends BaseService
         return (double) $this->get(self::LITEMALL_ORDER_UNPAID);
     }
 
+    public function getFreight($price)
+    {
+        $freightPrice = 0;
+        $freightMin = SystemService::getInstance()->getFreightMin();
+        if (bccomp($freightMin, $price) == 1) {
+            $freightPrice = SystemService::getInstance()->getFreightValue();
+        }
+        return $freightPrice;
+    }
+
     public function getFreightValue()
     {
         return (double) $this->get(self::LITEMALL_EXPRESS_FREIGHT_VALUE);

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Wx;
 
-use App\CodeResponse;
-use App\Input\PageInput;
 use App\Services\Goods\BrandService;
+use App\Utils\CodeResponse;
+use App\Utils\Inputs\PageInput;
 
 class BrandController extends WxController
 {

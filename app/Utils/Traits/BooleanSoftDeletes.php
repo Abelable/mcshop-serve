@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Utils\Traits;
+
+use App\Utils\BooleanSoftDeletingScope;
+use function tap;
 
 /**
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withTrashed(bool $withTrashed = true)

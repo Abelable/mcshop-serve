@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Wx;
 
-use App\CodeResponse;
-use App\Input\AddressSaveInput;
 use App\Services\User\AddressService;
+use App\Utils\CodeResponse;
+use App\Utils\Inputs\AddressSaveInput;
 
 class AddressController extends WxController
 {

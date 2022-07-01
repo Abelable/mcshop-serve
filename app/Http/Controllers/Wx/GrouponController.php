@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Wx;
 
-use App\Input\PageInput;
 use App\Models\Goods\Goods;
 use App\Models\Promotion\GrouponRules;
 use App\Services\Goods\GoodsService;
 use App\Services\Promotion\GrouponService;
+use App\Utils\Inputs\PageInput;
 
 class GrouponController extends WxController
 {

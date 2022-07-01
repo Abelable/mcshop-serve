@@ -86,6 +86,9 @@ class User extends BaseModel implements
 
     public function getJWTCustomClaims()
     {
-        return [];
+        return [
+            'iss' => env('JWT_ISSUER'),
+            'userId' => $this->getKey()
+        ];
     }
 }

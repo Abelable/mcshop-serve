@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Wx;
 
-use App\CodeResponse;
-use App\Enums\Constant;
-use App\Input\GoodsListInput;
 use App\Services\CollectService;
 use App\Services\CommentService;
 use App\Services\Goods\BrandService;
 use App\Services\Goods\CategoryService;
 use App\Services\Goods\GoodsService;
 use App\Services\SearchHistoryService;
+use App\Utils\CodeResponse;
+use App\Utils\Enums\Constant;
+use App\Utils\Inputs\GoodsListInput;
 
 class GoodsController extends WxController
 {

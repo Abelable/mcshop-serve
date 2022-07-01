@@ -2,7 +2,6 @@
 
 namespace App\Services\Goods;
 
-use App\Input\GoodsListInput;
 use App\Models\Goods\Footprint;
 use App\Models\Goods\Goods;
 use App\Models\Goods\GoodsAttribute;
@@ -10,6 +9,7 @@ use App\Models\Goods\GoodsProduct;
 use App\Models\Goods\GoodsSpecification;
 use App\Models\Goods\Issue;
 use App\Services\BaseService;
+use App\Utils\Inputs\GoodsListInput;
 use Illuminate\Database\Eloquent\Builder;
 
 class GoodsService extends BaseService
@@ -86,6 +86,14 @@ class GoodsService extends BaseService
         return GoodsProduct::query()->where('goods_id', $goodsId)->get();
     }
 
+    public function getProductListByIds(array $ids)
+    {
+        if (empty($ids)) {
+            return collect([]);
+        }
+        return GoodsProduct::query()->whereIn('id', $ids)->get();
+    }
+
     public function getGoodsProduct(int $id, $columns = ['*']) {
         return GoodsProduct::query()->find($id, $columns);
     }
@@ -111,5 +119,21 @@ class GoodsService extends BaseService
             return collect([]);
         }
         return Goods::query()->whereIn('id', $ids)->get();
+    }
+
+    public function reduceStock(int $productId, int $num)
+    {
+        return GoodsProduct::query()
+            ->where('id', $productId)
+            ->where('number', '>=', $num) // 乐观锁
+            ->decrement('number', $num);
+    }
+
+    public function addStock(int $productId, int $num)
+    {
+        // return GoodsProduct::query()->where('id', $productId)->increment('number', $num);
+        $product = $this->getGoodsProduct($productId);
+        $product->number = $product->number + $num;
+        return $product->cas();
     }
 }

@@ -1,11 +1,13 @@
 <?php
 
-namespace App;
+namespace App\Utils\Traits;
 
 
 use App\Exceptions\BusinessException;
+use App\Utils\CodeResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use function request;
 
 trait VerifyRequestInput
 {

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Wx;
 
-use App\CodeResponse;
-use App\Input\AuthRegisterInput;
 use App\Models\User\User;
 use App\Services\User\UserService;
+use App\Utils\CodeResponse;
+use App\Utils\Inputs\AuthRegisterInput;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;

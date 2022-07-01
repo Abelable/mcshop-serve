@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Utils;
 
 class CodeResponse
 {
@@ -21,6 +21,8 @@ class CodeResponse
 
     const GOODS_UNSHELVE = [710, '商品已经下架!'];
     const GOODS_NO_STOCK = [711, '商品库存不足!'];
+
+    const ORDER_INVALID_OPERATION = [725, '订单操作失败'];
 
     const GROUPON_EXPIRED = [730, '团购已过期!'];
     const GROUPON_OFFLINE = [731, '团购已下线!'];

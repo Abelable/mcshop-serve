@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Enums\Constant;
-use App\Input\PageInput;
 use App\Models\Comment;
 use App\Models\User\User;
 use App\Services\User\UserService;
+use App\Utils\Enums\Constant;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 

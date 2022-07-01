@@ -2,9 +2,9 @@
 
 namespace App\Services\User;
 
-use App\Input\AddressSaveInput;
 use App\Models\User\Address;
 use App\Services\BaseService;
+use App\Utils\Inputs\AddressSaveInput;
 
 class AddressService extends BaseService
 {

@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\CodeResponse;
 use App\Exceptions\BusinessException;
+use App\Utils\CodeResponse;
 
 class BaseService
 {

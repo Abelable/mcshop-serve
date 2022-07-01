@@ -2,16 +2,15 @@
 
 namespace App\Services\Promotion;
 
-use App\CodeResponse;
-use App\Enums\CouponEnums;
-use App\Enums\CouponUserEnums;
-use App\Input\PageInput;
 use App\Models\Promotion\Coupon;
 use App\Models\Promotion\CouponUser;
 use App\Services\BaseService;
+use App\Utils\CodeResponse;
+use App\Utils\Enums\CouponEnums;
+use App\Utils\Enums\CouponUserEnums;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use function Symfony\Component\Translation\t;
 
 class CouponService extends BaseService
 {

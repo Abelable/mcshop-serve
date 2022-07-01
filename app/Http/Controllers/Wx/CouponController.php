@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Wx;
 
-use App\Input\PageInput;
 use App\Models\Promotion\Coupon;
 use App\Models\Promotion\CouponUser;
 use App\Services\Promotion\CouponService;
+use App\Utils\Inputs\PageInput;
 
 class CouponController extends WxController
 {

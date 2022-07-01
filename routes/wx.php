@@ -62,5 +62,15 @@ Route::post('cart/checked', 'CartController@checked'); // 选择或取消选择�
 Route::post('cart/delete', 'CartController@delete'); // 删除购物车的商品
 Route::get('cart/checkout', 'CartController@checkout'); // 下单前信息确认
 
+// 订单模块--订单
+Route::post('order/submit', 'OrderController@submit'); // 提交订单
+Route::post('order/cancel', 'OrderController@cancel'); // 取消订单
+Route::post('order/refund', 'OrderController@refund'); // 退款取消订单
+Route::post('order/delete', 'OrderController@delete'); // 删除订单
+Route::post('order/confirm', 'OrderController@confirm'); // 确认收货
+Route::get('order/detail', 'OrderController@detail'); // 订单详情
+Route::post('order/h5pay', 'OrderController@h5pay'); // h5支付
+Route::post('order/wxNotify', 'OrderController@wxNotify'); // 微信支付回调
+
 Route::get('home/index', 'HomeController@index'); // 首页数据接口
 Route::get('home/redirectShareUrl', 'HomeController@redirectShareUrl')->name('home.redirectShareUrl'); // 获取海报分享页面路径

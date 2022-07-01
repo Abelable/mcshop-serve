@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Wx;
 use App\Services\Order\CartService;
 use App\Services\Order\OrderService;
 use App\Services\Promotion\CouponService;
+use App\Services\SystemService;
 use App\Services\User\AddressService;
 
 class CartController extends WxController
@@ -135,11 +136,12 @@ class CartController extends WxController
         }
 
         // 运费
-        $freightPrice = OrderService::getInstance()->getFreight($goodsTotalPrice);
+        $freightPrice = SystemService::getInstance()->getFreight($goodsTotalPrice);
 
         // 订单总金额
         $orderPrice = bcadd($goodsTotalPrice, $freightPrice, 2);
         $orderPrice = bcsub($orderPrice, $couponPrice, 2);
+        $orderPrice = max(0, $orderPrice);
 
         return $this->success([
             "addressId" => $addressId,

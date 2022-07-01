@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Input;
+namespace App\Utils\Inputs;
 
 class AddressSaveInput extends Input
 {

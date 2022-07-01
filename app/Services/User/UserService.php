@@ -2,11 +2,11 @@
 
 namespace App\Services\User;
 
-use App\CodeResponse;
 use App\Exceptions\BusinessException;
 use App\Models\User\User;
 use App\Notifications\VerificationCode;
 use App\Services\BaseService;
+use App\Utils\CodeResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;

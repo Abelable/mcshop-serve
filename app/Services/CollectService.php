@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Enums\Constant;
 use App\Models\Collect;
+use App\Utils\Enums\Constant;
 
 class CollectService extends BaseService
 {

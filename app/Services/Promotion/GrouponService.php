@@ -2,12 +2,12 @@
 
 namespace App\Services\Promotion;
 
-use App\CodeResponse;
-use App\Enums\GrouponEnums;
-use App\Input\PageInput;
 use App\Models\Promotion\Groupon;
 use App\Models\Promotion\GrouponRules;
 use App\Services\BaseService;
+use App\Utils\CodeResponse;
+use App\Utils\Enums\GrouponEnums;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -178,4 +178,6 @@ class GrouponService extends BaseService
 
         return Storage::url($filePath);
     }
+
+
 }

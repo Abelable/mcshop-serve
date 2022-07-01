@@ -2,13 +2,13 @@
 
 namespace App\Services\Order;
 
-use App\CodeResponse;
 use App\Models\Goods\Goods;
 use App\Models\Goods\GoodsProduct;
 use App\Models\Order\Cart;
 use App\Services\BaseService;
 use App\Services\Goods\GoodsService;
 use App\Services\Promotion\GrouponService;
+use App\Utils\CodeResponse;
 
 class CartService extends BaseService
 {
@@ -182,5 +182,13 @@ class CartService extends BaseService
             $cartPrice = bcadd($cartPrice, $price, 2);
         }
         return $cartPrice;
+    }
+
+    public function clearCart(int $userId, $cartId = null)
+    {
+        if (empty($cartId)) {
+            return Cart::query()->where('user_id', $userId)->where('checked', 1)->delete();
+        }
+        return Cart::query()->where('id', $cartId)->where('user_id', $userId)->delete();
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Wx;
 
-use App\CodeResponse;
 use App\Http\Controllers\Controller;
 use App\Models\User\User;
-use App\VerifyRequestInput;
+use App\Utils\CodeResponse;
+use App\Utils\Traits\VerifyRequestInput;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;

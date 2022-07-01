@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Input;
+namespace App\Utils\Inputs;
 
-use App\CodeResponse;
 use App\Exceptions\BusinessException;
+use App\Utils\CodeResponse;
 use Illuminate\Support\Facades\Validator;
+use function collect;
+use function request;
 
 class Input
 {

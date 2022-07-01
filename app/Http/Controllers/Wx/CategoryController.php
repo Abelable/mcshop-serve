@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Wx;
 
-use App\CodeResponse;
 use App\Services\Goods\CategoryService;
+use App\Utils\CodeResponse;
 
 class CategoryController extends WxController
 {

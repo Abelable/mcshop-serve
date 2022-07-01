@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Input;
+namespace App\Utils\Inputs;
 
 use Illuminate\Validation\Rule;
 

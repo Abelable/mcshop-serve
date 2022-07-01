@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\CodeResponse;
 use App\Exceptions\BusinessException;
+use App\Utils\CodeResponse;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 
 class Authenticate extends Middleware

@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers\Wx;
 
+use App\Models\Order\Order;
+use App\Services\Order\OrderService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\OrderSubmitInput;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends WxController
 {
     public function submit()
     {
+        /** @var OrderSubmitInput $input */
         $input = OrderSubmitInput::new();
 
         // 分布式锁，防止重复请求
@@ -19,6 +23,14 @@ class OrderController extends WxController
             $this->fail(CodeResponse::FAIL, '请勿重复请求');
         }
 
+        /** @var Order $order */
+        $order = DB::transaction(function () use ($input) {
+            return OrderService::getInstance()->submit($this->userId(), $input);
+        });
 
+        return $this->success([
+           'orderId' => $order->id,
+            'grouponLinkId' => $input->grouponLinkId
+        ]);
     }
 }

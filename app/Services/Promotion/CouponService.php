@@ -201,4 +201,24 @@ class CouponService extends BaseService
 
         return true;
     }
+
+    /**
+     * 获取登录用户没有领过的优惠券
+     * @param int $userId
+     * @param $offset
+     * @param $limit
+     * @return Coupon[]|array|Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
+     */
+    public function getAvailableList(int $userId, $offset = 0, $limit = 3)
+    {
+        $couponIds = CouponUser::query()->where('user_id', $userId)->get()->pluck('coupon_id')->toArray();
+        return Coupon::query()->when(!empty($couponIds), function (Builder $query) use ($couponIds) {
+            return $query->whereNotIn('id', $couponIds);
+        })->offset($offset)->limit($limit)->get();
+    }
+
+    public function getCouponList($offset = 0, $limit = 3, $order = 'desc', $sort = 'add_time')
+    {
+        return Coupon::query()->offset($offset)->limit($limit)->orderBy($sort, $order)->get();
+    }
 }

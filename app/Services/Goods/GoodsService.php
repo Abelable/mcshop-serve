@@ -94,7 +94,8 @@ class GoodsService extends BaseService
         return GoodsProduct::query()->whereIn('id', $ids)->get();
     }
 
-    public function getGoodsProduct(int $id, $columns = ['*']) {
+    public function getGoodsProduct(int $id, $columns = ['*'])
+    {
         return GoodsProduct::query()->find($id, $columns);
     }
 
@@ -135,5 +136,35 @@ class GoodsService extends BaseService
         $product = $this->getGoodsProduct($productId);
         $product->number = $product->number + $num;
         return $product->cas();
+    }
+
+    public function getNewGoodsList(int $limit)
+    {
+        $conditions = [
+            'is_on_sale' => 1,
+            'is_new' => 1
+        ];
+        return $this->getGoodsListByConditions($conditions, $limit);
+    }
+
+    public function getHotGoodsList(int $limit)
+    {
+        $conditions = [
+            'is_on_sale' => 1,
+            'is_hot' => 1
+        ];
+        return $this->getGoodsListByConditions($conditions, $limit);
+    }
+
+    public function getGoodsListByConditions(
+        array $conditions,
+        int   $limit,
+              $offset = 0,
+              $sort = 'add_time',
+              $order = 'desc',
+              $columns = ['id', 'name', 'brief', 'pic_url', 'is_new', 'is_hot', 'counter_price', 'retail_price']
+    )
+    {
+        return Goods::query()->where($conditions)->offset($offset)->limit($limit)->orderBy($sort, $order)->get($columns);
     }
 }

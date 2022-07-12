@@ -65,12 +65,22 @@ Route::get('cart/checkout', 'CartController@checkout'); // 下单前信息确认
 // 订单模块--订单
 Route::post('order/submit', 'OrderController@submit'); // 提交订单
 Route::post('order/cancel', 'OrderController@cancel'); // 取消订单
-Route::post('order/refund', 'OrderController@refund'); // 退款取消订单
-Route::post('order/delete', 'OrderController@delete'); // 删除订单
 Route::post('order/confirm', 'OrderController@confirm'); // 确认收货
+Route::post('order/refund', 'OrderController@refund'); // 退款
+Route::post('order/delete', 'OrderController@delete'); // 删除订单
 Route::get('order/detail', 'OrderController@detail'); // 订单详情
-Route::post('order/h5pay', 'OrderController@h5pay'); // h5支付
+Route::post('order/h5pay', 'OrderController@h5pay'); // h5微信支付
+Route::post('order/h5alipay', 'OrderController@h5alipay'); // h5支付宝支付
 Route::post('order/wxNotify', 'OrderController@wxNotify'); // 微信支付回调
+Route::post('order/alipayNotify', 'OrderController@alipayNotify'); // 支付宝支付回调
 
-Route::get('home/index', 'HomeController@index'); // 首页数据接口
 Route::get('home/redirectShareUrl', 'HomeController@redirectShareUrl')->name('home.redirectShareUrl'); // 获取海报分享页面路径
+Route::get('home/index', 'HomeController@index'); // 首页数据接口
+Route::get('collect/list', 'CollectController@getList'); // 收藏列表
+Route::post('collect/addordelete', 'CollectController@addOrDelete'); // 添加或取消收藏
+Route::get('topic/list', 'TopicController@getList'); // 专题列表
+Route::get('topic/detail', 'TopicController@getDetail'); // 专题详情
+Route::get('topic/related', 'TopicController@getRelated'); // 相关专题
+Route::get('user/index', 'UserController@index'); // 个人页面用户相关信息
+Route::post('feedback/submit', 'FeedbackController@submit'); // 添加反馈
+Route::get('issue/list', 'IssueController@getList'); // 帮助信息

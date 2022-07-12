@@ -91,4 +91,15 @@ class User extends BaseModel implements
             'userId' => $this->getKey()
         ];
     }
+
+    /**
+     * 制定短信发送给哪个手机号
+     * @param $driver
+     * @param $notification
+     * @return string
+     */
+    public function routeNotificationForEasySms($driver, $notification = null)
+    {
+        return $this->mobile;
+    }
 }

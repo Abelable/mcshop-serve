@@ -179,5 +179,8 @@ class GrouponService extends BaseService
         return Storage::url($filePath);
     }
 
-
+    public function getGrouponListByLimit($offset = 0, $limit = 5, $sort = 'add_time', $order = 'desc', $columns = ['*'])
+    {
+        return Groupon::query()->offset($offset)->limit($limit)->orderBy($sort, $order)->get($columns);
+    }
 }

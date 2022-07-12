@@ -8,6 +8,8 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\OrderSubmitInput;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Yansongda\LaravelPay\Facades\Pay;
 
 class OrderController extends WxController
 {
@@ -32,5 +34,74 @@ class OrderController extends WxController
            'orderId' => $order->id,
             'grouponLinkId' => $input->grouponLinkId
         ]);
+    }
+
+    public function cancel()
+    {
+        $orderId = $this->verifyRequiredId('orderId');
+        OrderService::getInstance()->userCancel($this->userId(), $orderId);
+        return $this->success();
+    }
+
+    public function confirm()
+    {
+        $orderId = $this->verifyRequiredId('orderId');
+        OrderService::getInstance()->confirm($this->userId(), $orderId);
+        return $this->success();
+    }
+
+    public function refund()
+    {
+        $orderId = $this->verifyRequiredId('orderId');
+        OrderService::getInstance()->refund($this->userId(), $orderId);
+        return $this->success();
+    }
+
+    public function delete()
+    {
+        $orderId = $this->verifyRequiredId('orderId');
+        OrderService::getInstance()->delete($this->userId(), $orderId);
+        return $this->success();
+    }
+
+    public function detail()
+    {
+        $orderId = $this->verifyId('orderId');
+        $detail = OrderService::getInstance()->detail($this->userId(), $orderId);
+        return $this->success($detail);
+    }
+
+    public function h5pay()
+    {
+        $orderId = $this->verifyRequiredId('orderId');
+        $order = OrderService::getInstance()->getWxPayOrder($this->userId(), $orderId);
+        return Pay::wechat()->wap($order);
+    }
+
+    public function h5alipay()
+    {
+        $orderId = $this->verifyRequiredId('orderId');
+        $order = OrderService::getInstance()->getAliPayOrder($this->userId(), $orderId);
+        return Pay::alipay()->wap($order);
+    }
+
+    public function wxNotify()
+    {
+        $data = Pay::wechat()->verify()->toArray();
+        Log::info('wxNotify', $data);
+        DB::transaction(function () use ($data) {
+            OrderService::getInstance()->wxNotify($data);
+        });
+        return Pay::wechat()->success();
+    }
+
+    public function alipayNotify()
+    {
+        $data = Pay::alipay()->verify()->toArray();
+        Log::info('alipayNotify', $data);
+        DB::transaction(function () use ($data) {
+            OrderService::getInstance()->alipayNotify($data);
+        });
+        return Pay::alipay()->success();
     }
 }

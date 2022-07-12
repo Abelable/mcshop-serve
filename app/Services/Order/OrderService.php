@@ -9,17 +9,22 @@ use App\Models\Goods\GoodsProduct;
 use App\Models\Order\Cart;
 use App\Models\Order\Order;
 use App\Models\Order\OrderGoods;
+use App\Notifications\NewPaidOrderEmailNotify;
+use App\Notifications\NewPaidOrderSmsNotify;
 use App\Services\BaseService;
 use App\Services\Goods\GoodsService;
 use App\Services\Promotion\CouponService;
 use App\Services\Promotion\GrouponService;
 use App\Services\SystemService;
 use App\Services\User\AddressService;
+use App\Services\User\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
 use App\Utils\Inputs\OrderSubmitInput;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class OrderService extends BaseService
@@ -160,6 +165,13 @@ class OrderService extends BaseService
         }
     }
 
+    public function userCancel(int $userId, int $orderId)
+    {
+        DB::transaction(function () use ($userId, $orderId) {
+            return $this->cancel($userId, $orderId);
+        });
+    }
+
     public function systemCancel(int $userId, int $orderId)
     {
         DB::transaction(function () use ($userId, $orderId) {
@@ -199,9 +211,109 @@ class OrderService extends BaseService
         return $order;
     }
 
+    public function refund(int $userId, int $orderId)
+    {
+        $order = $this->getOrder($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canRefundHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能申请退款');
+        }
+
+        $order->order_status = OrderEnums::STATUS_REFUND;
+
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
+
+        return $order;
+    }
+
+    public function confirm(int $userId, int $orderId, $isAuto = false)
+    {
+        $order = $this->getOrder($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canConfirmHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能被确认收货');
+        }
+
+        $order->comments = $this->countOrderGoods($orderId);
+        $order->order_status = $isAuto ? OrderEnums::STATUS_AUTO_CONFIRM : OrderEnums::STATUS_CONFIRM;
+        $order->confirm_time = now()->toDateTimeString();
+
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
+
+        return $order;
+    }
+
+    public function delete(int $userId, int $orderId)
+    {
+        $order = $this->getOrder($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canDeleteHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能删除');
+        }
+        $order->delete();
+
+        // todo 售后
+    }
+
+
+    public function detail(int $userId, int $orderId)
+    {
+        $order = $this->getOrder($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+
+        $detail = Arr::only($order->toArray(), [
+            'id',
+            'orderSn',
+            'message',
+            'addTime',
+            'consignee',
+            'mobile',
+            'address',
+            'goodsPrice',
+            'couponPrice',
+            'freightPrice',
+            'actualPrice',
+            'aftersaleStatus'
+        ]);
+
+        $detail['orderStatusText'] = OrderEnums::STATUS_TEXT_MAP[$order->order_status];
+        $detail['handleOption'] = $order->getCanHandleOptions();
+        if ($order->isShipStatus()) {
+            $detail['expCode'] = $order->ship_channel;
+            $detail['expNo'] = $order->ship_sn;
+            $detail['expName'] = ExpressService::getInstance()->getExpressName($order->ship_channel);
+        }
+
+        $goodsList = $this->getOrderGoodsList($orderId);
+        $express = ExpressService::getInstance()->getOrderTraces($order->ship_channel, $order->order_sn);
+
+        return [
+            'orderInfo' => $detail,
+            'orderGoods' => $goodsList,
+            'expressInfo' => $express
+        ];
+    }
+
     public function getOrder(int $userId, int $orderId)
     {
         return Order::query()->where('user_id', $userId)->find($orderId);
+    }
+
+    public function getOrderByOrderSn(string $orderSn)
+    {
+        return Order::query()->where('order_sn', $orderSn)->first();
     }
 
     public function returnStock(int $orderId)
@@ -220,5 +332,109 @@ class OrderService extends BaseService
     public function getOrderGoodsList(int $orderId)
     {
         return OrderGoods::query()->where('order_id', $orderId)->get();
+    }
+
+    public function countOrderGoods(int $orderId)
+    {
+        return OrderGoods::query()->where('order_id', $orderId)->count('id');
+    }
+
+    public function getWxPayOrder(int $userId, int $orderId)
+    {
+        $order = $this->getPayOrderInfo($userId, $orderId);
+        return [
+            'out_trade_no' => $order->order_sn,
+            'body' => '订单：' . $order->order_sn,
+            'total_fee' => bcmul($order->actual_price, 100)
+        ];
+    }
+
+    public function getAliPayOrder(int $userId, int $orderId)
+    {
+        $order = $this->getPayOrderInfo($userId, $orderId);
+        return [
+            'out_trade_no' => $order->order_sn,
+            'total_amount' => $order->actual_price,
+            'subject' => ''
+        ];
+    }
+
+    public function getPayOrderInfo(int $userId, int $orderId)
+    {
+        $order = $this->getOrder($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canPayHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能支付');
+        }
+        return $order;
+    }
+
+    public function wxNotify(array $data)
+    {
+        $orderSn = $data['out_trade_no'] ?? '';
+        $payId = $data['transaction_id'] ?? '';
+        $price = bcdiv($data['total_price'], 100, 2);
+        return $this->notify($price, $orderSn, $payId);
+    }
+
+    public function alipayNotify(array $data)
+    {
+        if (!in_array(($data['trade_status'] ?? ''), ['TRADE_SUCCESS', 'TRADE_FINISHED'])) {
+            $this->throwBusinessException();
+        }
+        $orderSn = $data['out_trade_no'] ?? '';
+        $payId = $data['transaction_id'] ?? '';
+        $price = $data['total_amount'] ?? 0;
+        return $this->notify($price,$orderSn, $payId);
+    }
+
+    public function notify($price, $orderSn, $payId)
+    {
+        $order = $this->getOrderByOrderSn($orderSn);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if ($order->isHadPaid()) {
+            return $order;
+        }
+        if (bccomp($order->actual_price, $price, 2) != 0) {
+            $errMsg = "支付回调，订单{$order->id}金额不一致，请检查，支付回调金额：{$price}，订单金额：{$order->actual_price}";
+            Log::error($errMsg);
+            $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
+        }
+        return $this->payOrder($order, $payId);
+    }
+
+    public function payOrder(Order $order, int $payId)
+    {
+        if (!$order->canPayHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_PAY_FAIL, '订单不能被支付');
+        }
+
+        $order->pay_id = $payId;
+        $order->pay_time = now()->toDateTimeString();
+        $order->order_status = OrderEnums::STATUS_PAY;
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
+
+        // 处理团购订单
+        GrouponService::getInstance()->payGrouponOrder($order->id);
+
+        // 发送邮件给管理员
+        Notification::route('mail', env('MAIL_USERNAME'))->notify(new NewPaidOrderEmailNotify($order->id));
+
+        // 发送短信给用户
+        $user = UserService::getInstance()->getUserById($order->user_id);
+        $user->notify(new NewPaidOrderSmsNotify());
+
+        return $order;
+    }
+
+    public function getOrderListByUserId(int $userId)
+    {
+        return Order::query()->where('user_id', $userId)->get();
     }
 }

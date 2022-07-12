@@ -28,7 +28,7 @@ use Illuminate\Support\Str;
  */
 trait OrderStatusTrait
 {
-    public function __call(string $name, array $arguments)
+    public function __call($name, $arguments)
     {
         if (Str::is('can*Handle', $name)) {
             if (is_null($this->order_status)) {

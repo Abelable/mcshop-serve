@@ -33,7 +33,7 @@ class UserController extends WxController
             }
         });
         return $this->success([
-            'order' => compact('unpaid', 'unship', 'unrecv', $uncomment)
+            'order' => compact('unpaid', 'unship', 'unrecv', 'uncomment')
         ]);
     }
 }

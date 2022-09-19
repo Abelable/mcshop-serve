@@ -43,7 +43,7 @@ class OrderService extends BaseService
         }
 
         // 3. 获取购物车商品列表
-        $cartList = CartService::getInstance()->getPreorderCartList();
+        $cartList = CartService::getInstance()->getPreorderCartList($userId, $input->cartId);
 
         // 4. 计算团购优惠和商品价格
         $grouponPrice = 0;
@@ -382,7 +382,7 @@ class OrderService extends BaseService
     public function alipayNotify(array $data)
     {
         if (!in_array(($data['trade_status'] ?? ''), ['TRADE_SUCCESS', 'TRADE_FINISHED'])) {
-            $this->throwBusinessException();
+            $this->throwBusinessException(CodeResponse::ORDER_PAY_FAIL);
         }
         $orderSn = $data['out_trade_no'] ?? '';
         $payId = $data['transaction_id'] ?? '';
@@ -401,7 +401,7 @@ class OrderService extends BaseService
         }
         if (bccomp($order->actual_price, $price, 2) != 0) {
             $errMsg = "支付回调，订单{$order->id}金额不一致，请检查，支付回调金额：{$price}，订单金额：{$order->actual_price}";
-            Log::error($errMsg);
+            \Log::error($errMsg);
             $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
         }
         return $this->payOrder($order, $payId);

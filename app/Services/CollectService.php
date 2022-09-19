@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Collect;
 use App\Utils\Enums\Constant;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 
 class CollectService extends BaseService

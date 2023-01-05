@@ -134,7 +134,7 @@ class CartService extends BaseService
     public function updateChecked(int $userId, int $productIds, bool $isChecked)
     {
         return Cart::query()
-            ->where('user_id')
+            ->where('user_id', $userId)
             ->whereIn('product_id', $productIds)
             ->update(['checked' => $isChecked]);
     }

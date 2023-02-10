@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Wx;
 
 use App\Services\Order\CartService;
-use App\Services\Order\OrderService;
 use App\Services\Promotion\CouponService;
 use App\Services\SystemService;
 use App\Services\User\AddressService;

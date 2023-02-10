@@ -47,8 +47,8 @@ class GoodsController extends WxController
         /** @var GoodsListInput $input */
         $input = GoodsListInput::new();
 
-        if ($this->isLogin() && !empty($input->keyword)) {
-            SearchHistoryService::getInstance()->save($this->userId(), $input->keyword, Constant::SEARCH_HISTORY_FROM_WX);
+        if ($this->isLogin() && !empty($input->keywords)) {
+            SearchHistoryService::getInstance()->save($this->userId(), $input->keywords, Constant::SEARCH_HISTORY_FROM_WX);
         }
 
         $columns = ['id', 'name', 'brief', 'pic_url', 'is_new', 'is_hot', 'counter_price', 'retail_price'];

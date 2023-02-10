@@ -30,7 +30,7 @@ class CollectController extends WxController
               'retailPrice' => $goods->retail_price
             ];
         });
-        return $this->successPaginate($paginate, $list);
+        return $this->success($this->paginate($paginate, $list));
     }
 
     public function addOrDelete()
